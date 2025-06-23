@@ -1,0 +1,73 @@
+Reglas rectangulares (punto medio) 
+Integración aproximada
+No siempre podemos simplicar las integrales para resolverlas con antiderivadas. 
+Obtenemos datos de forma tubular,  pero para encontrar la función y el volumen, longitud,etc. Con integrales no funciona muy bien y con matlab con punto medio si. 
+En el punto medio no desperdiciamos tanto, y pues se utiliza la formula de punto medio. 
+
+clc; clear; close all;
+
+
+%Definimos la función 
+f = @(x) x.^3; %De que no definimos directamente la función pero la metemos en una variable 
+
+%Establecemos los limites de intregación (donde vamos a evaluar) 
+a = 0; 
+b = 1; 
+
+%Definimos el numero de rectangulos ( aumentan para mayor presión)
+n = 10; %La podemos adjustar 
+
+%Calculamos el ancho de cada rectangulo (magic formula based on limites de
+%integracion) 
+dx = (b-a)/n; 
+
+%Calculamos los puntos medios de cada rectangulo
+x_medio = a + dx/2 : dx : b - dx/2; %Something like an array that will start in the fist block and the el paso que diriamos que cuenta es del delta de x y luego el factor final 
+
+%Calculamos los valores de la función con los puntos medios
+y_medio=f(x_medio) %Digamos que los paso por arriba 
+
+%aplicamos la regla del rectangulo (punto medio) paa aproximar la integral 
+integral_aprox= sum(y_medio * dx);
+
+%Calculamos el valor aproximado y exacto de la integral
+valor_exacto = integral (f,a,b);
+
+%Mostramos los valores aproximado y exacto de integral 
+disp(["Valor aproximado de la integral usando la regal del ractangulo:", num2str(integral_aprox)]);
+disp(["Valor exacto de la integral : ", num2str(valor_exacto)]);
+
+%Graficamos la función 
+x_denso = linspace(a,b,1000); %Valores densos de x para cuerva suave 
+y_denso = f(x_denso);
+figure; 
+plot(x_denso, y_denso, 'b', 'LineWidth',3);
+hold on; 
+
+%Graficando rectangulos 
+for i=1:n 
+    %obtenemos los valores de x y y para el rectangulo actual 
+    x_rect = [x_medio -dx/2, x_medio(i) +dx/2, x_medio(i) +dx/2, x_medio(i) -dx/2];
+    y_rect = [0, 0, y_medio(i), y_medio(i)]; 
+    
+    %Rellenar area 
+    fill(x_rect, y_rect, [0.7 0.9 1], 'EdgeColor', 'none');
+end 
+
+xlabel('x');
+ylabel('y'); 
+title('Aproximación de ractangulos'); 
+
+%Mostrar la cuadricula 
+grid on; 
+
+%Establecer los limites del eje para mejor visualización
+xlim([0 1]); 
+ylim([0 1]); 
+
+%Anotar la grafia con el resultado de la regla 
+text(0.2, 0.85, ['Integral aproximada=', num2str(integral_aprox)], 'FontSize', 10, 'Color','k','FontWeight','bold'); 
+text(0.2, 0.75, ['Integral exacta = ', num2str(valor_exacto)], 'FontSize', 10, 'Color','k', 'FontWeight','bold');
+text(0.2, 0.65, ['Numero de Rectangulos (n) = ', num2str(n)], 'FontSize', 10, 'Color','k', 'FontWeight','bold');
+
+hold off; 
