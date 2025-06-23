@@ -1,0 +1,74 @@
+clc; clear; close all;
+table = readtable('data_water.csv');
+
+t = table.time;
+torque = table.torque;
+
+% Definir función 
+fun = @(x, A, mu, sigma) A * (1 / sqrt(2 * pi * sigma^2)) * exp(-(x - mu).^2 / (2 * sigma^2));
+
+% Ajuste parametros gráfica 
+ajuste_parametros = lsqcurvefit(@(params, x) fun(x, params(1), params(2), params(3)), ...
+                           [max(torque), mean(t), std(t)], t, torque);
+
+% Parametros ajustados
+A = ajuste_parametros(1);
+mu = ajuste_parametros(2);
+sigma = ajuste_parametros(3);
+
+% Generar grafica ajustada torque 
+ajuste_torque = fun(t, A, mu, sigma);
+
+% Graficar
+figure;
+hold on
+plot(t, torque, 'b-', 'DisplayName', 'Información Original');
+plot(t, ajuste_torque, 'r-', 'LineWidth', 2, 'DisplayName', 'Curva Ajustada');
+ylim([-5 40])
+xlim([0, 140])
+xlabel('Tiempo');
+ylabel('Torque');
+legend;
+title('Curva Agua');
+grid on;
+
+% Resultados 
+disp('Ajuste de Parametros:');
+disp(['A = ', num2str(A)]);
+disp(['mu = ', num2str(mu)]);
+disp(['sigma = ', num2str(sigma)]);
+
+%Inercia valores iniciales 
+masa_rueda = 670; 
+r1= 2.1; 
+r2 = 2.3; 
+r11 = 1.5; 
+r22 = 1.6; 
+masa_anillo = 250; 
+
+%Calculos inercias 
+I_rueda= 0.5 * masa_rueda * (r1^2 + r2^2); 
+I_barra = (4 * 400 * r1^2)/12; 
+I_solido = 0.5 * 670 * 1.2^2; 
+I_anillo = 0.5 * masa_anillo * ( r11^2 + r22^2); 
+I_total = I_rueda + 4 * I_barra + 9 * r2^2 * 21.5 * 7 * r2^2 * 1.5 + I_anillo + I_solido
+
+% Definir función a integrar
+fun = @(x) 2393.0807 / I_total * (1 / sqrt(2 * pi * 29.9389^2)) ...
+           * exp(-(x - 65.1295).^2 / (2 * 29.9389^2));
+
+% Crear puntos para evaluar la integral y graficar
+N = 0:0.1:129.9; % Rango de integración
+Integrales_alpha = zeros(1, length(N) - 1);
+
+% Calcular integrales acumulativas
+for i = 1:length(N)-1
+    Integrales_alpha(i) = integral(fun, 0, N(i));
+end
+
+% Graficar resultados
+plot(N(1:end-1), Integrales_alpha, 'b-', 'LineWidth', 2);
+grid on;
+xlabel('Tiempo');
+ylabel('Integral acumulativa');
+title('Gráfica de la integral acumulativa');
