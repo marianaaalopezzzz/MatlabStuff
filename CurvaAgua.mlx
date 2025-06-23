@@ -1,0 +1,37 @@
+%Calculo de la aceleración 
+clc; clear; close all;
+table = readtable('data_water.csv');
+
+t = table.time; 
+torque = table.torque; 
+
+% Funció n creada en ajuste.m 
+func = @(x, A, mu, sigma) A * (1/sqrt(2 * pi * sigma^2)) * exp(-(x - mu).^2 / (2 * sigma^2)); 
+
+%Datos iniciales de la función
+inicial = [max(torque), mean(t), std(t)];
+
+% Ajustar la grafica
+x_ajuste = lsqcurvefit(@(param, x) func(x,param(1),param(2),param(3)), ...
+    inicial, t, torque);
+
+A = x_ajuste(1); 
+mu = x_ajuste(2); 
+sigma = x_ajuste(3);
+
+%Generar el ajuste de la curva 
+curva_ajuste = func(t, A, mu, sigma);
+
+%Creación de grafica 
+figure; 
+hold on
+plot(t,torque, 'b','DisplayName','Ruido Agua');
+plot(t, curva_ajuste, 'o--','LineWidth',2, 'DisplayName','Ajuste de la Curva');
+ylim([-5 40]);
+xlim([0, 140]);
+legend; 
+title('Curva guassiana ajustada'); 
+xlabel('Tiempo'); 
+ylabel('Torque'); 
+hold off; 
+
