@@ -1,0 +1,69 @@
+%La aproximación que tendriamos en el trapesoidal es como una forma inclinada en la curva. promediamos la suma de todos los rectangulos inferiories y sumamos los superiores y los dividimos entre dos y me queda el trapecio. (like a promedio) 
+
+clc, clear, close all
+
+% Definir la función
+f = @(x) x.^3;
+
+% Establecer los límites de integración
+a = 0;
+b = 1;
+
+% Definir el número de trapecios (incrementar para mayor precisión)
+n = 5; % Ajusta n para diferentes niveles de precisión
+
+% Calcular el ancho de cada trapecio
+dx = (b - a) / n;
+
+% Definir los valores de x en los límites de cada trapecio
+x_valores = a:dx:b;
+
+% Calcular los valores de y para cada punto de x
+y_valores = f(x_valores);
+
+% Aplicar la regla del trapecio para aproximar la integral
+integral_aprox = (dx/2)* 2 *(f(a)) +  2*sum(f(x_valores(2:end:-1))) +f(b);
+
+% Calcular el valor exacto usando la función incorporada de MATLAB
+valor_exacto = integral(f, a, b);
+
+% Mostrar los valores aproximado y exacto de la integral
+disp(['Valor aproximado de la integral usando la regla del trapecio: ', num2str(integral_aprox)]);
+disp(['Valor exacto de la integral: ', num2str(valor_exacto)]);
+
+% Graficar la función
+x_denso = linspace(a, b, 1000); % Valores densos de x para curva suave
+y_denso = f(x_denso);
+figure;
+plot(x_denso, y_denso, 'b', 'LineWidth', 2);
+hold on;
+
+% Graficar los trapecios
+for i = 1:n
+    % Obtener los valores x e y para el trapecio actual
+    x_trap = [x_valores(i), x_valores(i+1), x_valores(i+1), x_valores(i)];
+    y_trap = [0, 0, y_valores(i+1), y_valores(i)];
+
+    % Rellenar el área del trapecio
+    fill(x_trap, y_trap, [0.7 0.9 1], 'EdgeColor', 'none');
+end
+
+% Agregar etiquetas y título
+xlabel('x');
+ylabel('f(x) = x^3');
+title('Aproximación de Trapecios');
+
+% Mostrar la cuadrícula
+grid on;
+
+% Establecer los límites del eje para mejor visualización
+xlim([0 1]);
+ylim([0 1]);
+
+% Anotar la gráfica con el resultado de la regla del trapecio, el valor exacto y n
+text(0.2, 0.85, ['Integral Aproximada = ', num2str(integral_aprox)], 'FontSize', 10, 'Color', 'k', 'FontWeight', 'bold');
+text(0.2, 0.75, ['Integral Exacta = ', num2str(valor_exacto)], 'FontSize', 10, 'Color', 'k', 'FontWeight', 'bold');
+text(0.2, 0.65, ['Número de Trapecios (n) = ', num2str(n)], 'FontSize', 10, 'Color', 'k', 'FontWeight', 'bold');
+
+% Finalizar la gráfica
+hold off;
