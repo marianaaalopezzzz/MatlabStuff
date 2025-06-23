@@ -1,0 +1,73 @@
+clc, clear, close all
+% Parámetros
+num_bolas = 20; % número de bolas
+radio = 1; % radio de las bolas
+dt = 0.05; % paso de tiempo
+area_lim = 20; % límites del área de simulación (de -20 a 20 en x y y)
+% Inicialización de las bolas
+posiciones = (rand(num_bolas, 2) - 0.5) * 2 * (area_lim - radio); %
+posiciones aleatorias
+velocidades = (rand(num_bolas, 2) - 0.5) * 10; % velocidades aleatorias
+%masas = ones(num_bolas, 1); % masas iguales
+% Configuración de la ventana de animación
+figure;
+axis([-area_lim area_lim -area_lim area_lim]);
+hold on;
+% Crear las bolas
+bolas = gobjects(num_bolas, 1);
+for i = 1:num_bolas
+bolas(i) = rectangle('Position', [posiciones(i, 1) - radio,
+posiciones(i, 2) - radio, 2 * radio, 2 * radio], ...
+'Curvature', [1, 1], 'FaceColor', rand(1, 3));
+end
+% Animación
+while true
+% Actualizar posiciones
+posiciones = posiciones + velocidades * dt;
+% Detección de colisiones con paredes
+for i = 1:num_bolas
+% Colisiones con paredes en x
+if posiciones(i, 1) + radio > area_lim || posiciones(i, 1) - radio
+< - area_lim
+velocidades(i, 1) = -velocidades(i, 1);
+end
+% Colisiones con paredes en y
+if posiciones(i, 2) + radio > area_lim || posiciones(i, 2) - radio
+< - area_lim
+velocidades(i, 2) = -velocidades(i, 2);
+end
+end
+% Detección y manejo de colisiones entre bolas
+for i = 1:num_bolas-1
+for j = i+1:num_bolas
+% Verificar si hay colisión
+distancia = norm(posiciones(i, :) - posiciones(j, :));
+1
+if distancia < 2 * radio
+% Vector normal y tangente
+normal = (posiciones(i, :) - posiciones(j, :)) / distancia;
+tangente = [-normal(2), normal(1)];
+% Componentes de velocidad en normal y tangente
+vi_normal = dot(velocidades(i, :), normal);
+vj_normal = dot(velocidades(j, :), normal);
+vi_tangente = dot(velocidades(i, :), tangente);
+vj_tangente = dot(velocidades(j, :), tangente);
+% Velocidades finales después de la colisión (elásticas)
+vi_normal_final = vj_normal;
+vj_normal_final = vi_normal;
+% Convertir de nuevo a componentes x e y
+velocidades(i, :) = vi_normal_final * normal + vi_tangente
+velocidades(j, :) = vj_normal_final * normal + vj_tangente
+* tangente;
+* tangente;
+end
+end
+end
+% Actualizar posiciones gráficamente
+for i = 1:num_bolas
+bolas(i).Position = [posiciones(i, 1) - radio, posiciones(i, 2) -
+radio, 2 * radio, 2 * radio];
+end
+% Pausar para animación
+pause(dt);
+end
