@@ -1,0 +1,44 @@
+clc, clear; close all;
+
+
+dt = 0.01;
+S = zeros(1,5000);
+R = zeros(1,5000);
+I = zeros(1,5000);
+T = zeros(1,5000);
+S(1) = 45400;
+R(1) = 2500;
+I(1) = 2100;
+
+for i = 2:5000
+    S(i) = S(i-1) + dt*(-0.00001*S(i-1)*I(i-1));
+    I(i) = I(i-1) + dt*(0.00001*S(i-1)*I(i-1) - (1/14)*I(i-1));
+    R(i) = R(i-1) + dt*((1/14)*I(i-1));
+    T(i) = T(i-1) + dt;
+end
+
+hold on; 
+plot(T,S, "b-", "LineWidth",1)
+xlim([0, 40]);
+ylim([0, 50000]);
+
+plot(T,I, "r--", "LineWidth",1)
+xlim([0,40]); 
+ylim([0, 50000]);
+
+plot(T,R, 'g-', "LineWidth",1)
+xlim([0, 40]);
+ylim([0, 50000]);
+
+ylabel("Personas")
+xlabel("Tiempo")
+
+title("SIR Influenza")
+legend('Suceptibles', 'Infectados', 'Recuperados');
+
+hold off;
+
+legend(["Suceptibles", "Infectados", "Recuperados"]); 
+
+
+
